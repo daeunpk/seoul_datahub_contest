@@ -1,0 +1,488 @@
+{
+  "도산근린공원": {
+    "공원명": "도산근린공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "율현공원": {
+    "공원명": "율현공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "경의선숲길": {
+    "공원명": "경의선숲길",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "문화비축기지": {
+    "공원명": "문화비축기지",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 107,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "올림픽공원": {
+    "공원명": "올림픽공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 12,
+    "spaces": 2800,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "송파나루근린공원(석촌호수)": {
+    "공원명": "송파나루근린공원(석촌호수)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 324,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "인왕산도시자연공원(인왕산)": {
+    "공원명": "인왕산도시자연공원(인왕산)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": true,
+    "notes": [
+      "인근 공영주차장 이용"
+    ]
+  },
+  "낙산공원": {
+    "공원명": "낙산공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 29,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "북한산국립공원(북한산)": {
+    "공원명": "북한산국립공원(북한산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 12,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": [
+      "구획수 값 추정/이상치 포함: 주차구획수: 북한산성 제 1, 2 주차장 약 612대 이상, 송추 제 1, 2 주차장 정보 없음(규모는 크다고 함)"
+    ]
+  },
+  "서울로 7017": {
+    "공원명": "서울로 7017",
+    "구": null,
+    "has_parking": null,
+    "lots_count": null,
+    "spaces": null,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": [
+      "주차장: 인근 주차장 이용"
+    ]
+  },
+  "남산공원": {
+    "공원명": "남산공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 2,
+    "spaces": 105,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "용산가족공원": {
+    "공원명": "용산가족공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 48,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "효창근린공원(효창공원)": {
+    "공원명": "효창근린공원(효창공원)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "길동생태공원": {
+    "공원명": "길동생태공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "일자산허브천문공원": {
+    "공원명": "일자산허브천문공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "북서울꿈의숲": {
+    "공원명": "북서울꿈의숲",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 2,
+    "spaces": 386,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "방화근린공원": {
+    "공원명": "방화근린공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "우장산근린공원(우장산/우장산근린공원)": {
+    "공원명": "우장산근린공원(우장산/우장산근린공원)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 100,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "서울식물원": {
+    "공원명": "서울식물원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 925,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "서울대공원": {
+    "공원명": "서울대공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 7,
+    "spaces": 5818,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "관악산공원(관악산)": {
+    "공원명": "관악산공원(관악산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 49,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "어린이대공원": {
+    "공원명": "어린이대공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 979,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "아차산공원(아차산)": {
+    "공원명": "아차산공원(아차산)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "고척근린공원": {
+    "공원명": "고척근린공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 199,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "푸른수목원": {
+    "공원명": "푸른수목원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 122,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "금천체육공원": {
+    "공원명": "금천체육공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 26,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "금천폭포근린공원": {
+    "공원명": "금천폭포근린공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "수락산도시자연공원(수락산)": {
+    "공원명": "수락산도시자연공원(수락산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 120,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "불암산도시자연공원(불암산)": {
+    "공원명": "불암산도시자연공원(불암산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 65,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "서울창포원": {
+    "공원명": "서울창포원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 10,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": [
+      "구획수 값 추정/이상치 포함: 주차구획수: 약 10대"
+    ]
+  },
+  "용두근린공원(용두공원)": {
+    "공원명": "용두근린공원(용두공원)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "배봉산근린공원(배봉산)": {
+    "공원명": "배봉산근린공원(배봉산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 20,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "국립서울현충원": {
+    "공원명": "국립서울현충원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 5,
+    "spaces": 500,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": [
+      "구획수 값 추정/이상치 포함: 주차구획수: 약 500대"
+    ]
+  },
+  "보라매공원": {
+    "공원명": "보라매공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 2,
+    "spaces": 108,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "독립공원(서대문독립공원)": {
+    "공원명": "독립공원(서대문독립공원)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 38,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "청계산도시자연공원(청계산)": {
+    "공원명": "청계산도시자연공원(청계산)",
+    "구": null,
+    "has_parking": null,
+    "lots_count": null,
+    "spaces": null,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": [
+      "주차장:"
+    ]
+  },
+  "매헌시민의숲": {
+    "공원명": "매헌시민의숲",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "서울숲": {
+    "공원명": "서울숲",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 211,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "달맞이근린공원": {
+    "공원명": "달맞이근린공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "청량근린공원(천장산)": {
+    "공원명": "청량근린공원(천장산)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "서서울호수공원": {
+    "공원명": "서서울호수공원",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "파리근린공원(파리공원)": {
+    "공원명": "파리근린공원(파리공원)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 50,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "선유도공원": {
+    "공원명": "선유도공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": null,
+    "accessible_only": true,
+    "external_parking": false,
+    "notes": [
+      "장애인 전용"
+    ]
+  },
+  "여의도공원(여의도도시근린공원)": {
+    "공원명": "여의도공원(여의도도시근린공원)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "진관근린공원(구파발폭포/이말산)": {
+    "공원명": "진관근린공원(구파발폭포/이말산)",
+    "구": null,
+    "has_parking": false,
+    "lots_count": 0,
+    "spaces": 0,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "사가정공원(용마산)": {
+    "공원명": "사가정공원(용마산)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": null,
+    "spaces": 4,
+    "accessible_only": true,
+    "external_parking": false,
+    "notes": [
+      "장애인 전용"
+    ]
+  },
+  "중랑캠핑숲(중랑가족캠핑장)": {
+    "공원명": "중랑캠핑숲(중랑가족캠핑장)",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 170,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  }
+}
