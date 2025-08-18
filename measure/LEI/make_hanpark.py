@@ -40,7 +40,7 @@ for festival, parks_str in festival_data.items():
         else:
             normalized_park = park
         
-        # '축제명'과 '공원명'을 짝지어 리스트에 추가합니다.
+        # 'festival_nm'과 'park_nm'을 짝지어 리스트에 추가합니다.
         processed_data.append({'festival_nm': festival, 'park_nm': normalized_park})
 
 # 3. Pandas 데이터프레임으로 변환
