@@ -1,0 +1,62 @@
+# --- OS 잡파일 ---
+.DS_Store
+Icon?
+Thumbs.db
+
+# --- Python 기본 ---
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+build/
+dist/
+site/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+# (권장) 노트북 출력물은 커밋하지 않기 → nbstripout 등으로 별도 관리
+
+# --- 캐시/도구 ---
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pylint.d/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# --- IDE / 편집기 ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- 환경파일 / 비밀정보 ---
+.env
+.env.*
+*.pem
+*.key
+
+# --- 데이터(원천데이터는 깃 제외, 설명/샘플만 포함) ---
+SAF/data/**
+!SAF/data/README.md
+!SAF/data/.gitkeep
+!SAF/data/sample/**
+
+# --- 결과물/아티팩트(필요 시 예외 해제) ---
+outputs/**
+reports/**
+figures/**
+export/**
+tmp/
+temp/
