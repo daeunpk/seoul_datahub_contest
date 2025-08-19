@@ -1,0 +1,112 @@
+{
+  "뚝섬한강공원": {
+    "공원명": "뚝섬한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 674,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "잠원한강공원": {
+    "공원명": "잠원한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 6,
+    "spaces": 722,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "여의도한강공원": {
+    "공원명": "여의도한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 5,
+    "spaces": 1782,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "반포한강공원": {
+    "공원명": "반포한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 5,
+    "spaces": 819,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "망원한강공원": {
+    "공원명": "망원한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 2,
+    "spaces": 332,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "잠실한강공원": {
+    "공원명": "잠실한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 387,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "양화한강공원": {
+    "공원명": "양화한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 3,
+    "spaces": 501,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "난지한강공원": {
+    "공원명": "난지한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 618,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "이촌한강공원": {
+    "공원명": "이촌한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 371,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "광나루한강공원": {
+    "공원명": "광나루한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 4,
+    "spaces": 389,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  },
+  "강서한강공원": {
+    "공원명": "강서한강공원",
+    "구": null,
+    "has_parking": true,
+    "lots_count": 1,
+    "spaces": 52,
+    "accessible_only": false,
+    "external_parking": false,
+    "notes": []
+  }
+}
