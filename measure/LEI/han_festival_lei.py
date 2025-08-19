@@ -18,7 +18,7 @@ try:
 
     # 3. 공원별 데이터 분석 및 여가도 계산
     # '공원명'을 기준으로 그룹화하여 분석을 수행합니다.
-    park_analysis = df.groupby('park_nm').agg(
+    park_analysis = df.groupby('공원명').agg(
         # '축제명'의 개수를 세어 '총 축제 수'를 계산합니다.
         총_축제_수=('festival_nm', 'count'),
         # 함수를 이용해 '축제 다양성 지수'를 계산합니다.
