@@ -72,7 +72,7 @@ def crawl_reviews_by_count(key_words, target_reviews=700, headless=False, timeou
         ### ★★★ 3. 올바른 스크롤 대상 지정 ★★★
         # 리뷰 탭을 클릭한 '이후에' 스크롤 대상을 찾음으로써, '리뷰 목록'을 정확히 지정합니다.
         print("[info] 리뷰 스크롤 패널 찾는 중...")
-        scroll_div_selector = 'div.m6QErb'
+        scroll_div_selector = 'div.m6QErb.DxyBCb.kA9KIf.dS8AEf[role="main"]'
         scroll_div = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, scroll_div_selector)))
         
         # 리뷰 카드(항목)를 찾는 함수
