@@ -75,35 +75,36 @@ def crawl_reviews_by_count(key_words, target_reviews=50, headless=False, timeout
                     except Exception as e:
                         print(f"[warn] '더보기' 버튼 클릭 중 에러: {e}")
 
-                    ### ★★★ 핵심 수정: 분리된 텍스트(본문+태그)를 조합하는 로직 ★★★
                     try:
-                        # 1. 일반 본문 추출
+                        ### ★★★ 핵심 수정: main_content 확인 로직 위치 변경 ★★★
                         main_content = ""
                         try:
                             main_content = card.find_element(By.CLASS_NAME, 'wiI7pd').text
                         except NoSuchElementException:
-                            pass # 본문이 없는 경우도 있음
+                            # main_content를 찾지 못하면 바로 다음 리뷰로 건너뜀
+                            continue
+                        
+                        # main_content가 비어있으면(텍스트가 없으면) 이 리뷰는 건너뜀
+                        if not main_content.strip():
+                            continue
 
-                        # 2. 태그(볼드) 텍스트 추출
+                        # main_content가 있는 경우에만 태그 추출 및 나머지 작업 수행
                         tag_content = ""
                         try:
                             tag_elements = card.find_elements(By.CLASS_NAME, 'PBK6be')
-                            # 각 태그 텍스트를 공백으로 연결
                             tag_content = " ".join([tag.text for tag in tag_elements])
                         except NoSuchElementException:
-                            pass # 태그가 없는 경우도 있음
+                            pass
                         
-                        # 3. 두 텍스트를 하나로 합침
                         full_content = f"{main_content} {tag_content}".strip().replace('\n', ' ')
                         
-                        # 나머지 정보 추출
                         author = card.find_element(By.CLASS_NAME, 'd4r55').text
                         rating = card.find_element(By.CLASS_NAME, 'kvMYJc').get_attribute('aria-label')
                         date = card.find_element(By.CLASS_NAME, 'rsqaWe').text
                         
                         rows.append({
                             '작성자': author,
-                            '내용': full_content, # 조합된 전체 내용을 저장
+                            '내용': full_content,
                             '별점': rating,
                             '작성일': date
                         })
@@ -128,58 +129,23 @@ def crawl_reviews_by_count(key_words, target_reviews=50, headless=False, timeout
 
     finally:
         driver.quit()
-
+                
 # ### ★★★ 핵심 수정 부분: 각 키워드마다 다른 리뷰 수를 설정 ★★★
 if __name__ == "__main__":
     
     # 1. 크롤링할 키워드와 목표 리뷰 수를 딕셔너리 형태로 정의합니다.
     keywords_dict = {
-        # '관악산 호수공원' : ,
-        # '국립서울현충원' : ,
-        # '경의선숲길공원' : ,
-        # '남산 공원' : ,
-        '도산공원' : 1000,
-        '율현공원' : 300,
-        '길동생태공원' : 100,
-        '허브천문공원': 600,
-        '북서울 꿈의숲': 2000,
-        '성북구 북한산국립공원' : 1500,
-        '방화근린공원' : 685,
-        '우장산공원' : 511,
-        '서울대공원' : 2000,
-        '아차산 생태공원' : 1500,
-        '광진 어린이대공원' : 4000,
-        '고척근린공원' : 1000,
-        '푸른수목원' : 1500,
-        '금천체육공원' : 519,
-        '금천폭포공원' : 93,
-        '수락산' : 372,
-        '불암산' : 132,
-        '서울창포원' : 1900,
-        '용두근린공원' : 235,
-        '배봉산근린공원' : 1500,
-        '여의대방로 보라매공원' : 4000,
-        '문화비축기지' : 2000,
-        '서대문독립공원' : 500,
-        '상적동 청계산 매봉' : 1154,
-        '매헌시민의숲' : 70,
-        '서울숲공원': 6000,
-        '성동구 달맞이공원' : 349,
-        '월곡 천장산' : 29,
-        '올림픽공원' : 1500,
-        '석촌호수공원' : 3000,
-        '서서울호수공원' : 1500,
-        '파리공원' : 2000,
-        '영등포 선유도공원' : 3000,
-        '여의도공원' : 4000,
-        '용산가족공원' : 2000,
-        '효창공원' : 2000,
-        '구파발폭포' : 11,
-        '인왕산' : 298,
-        '낙산공원' : 4000,
-        '서울로7017' : 6000,
-        '사가정공원' : 600,
-        '중랑캠핑숲 중랑가족캠핑장' : 834,
+        '여의도한강공원' : 1500,
+        '반포한강공원' : 1500,
+        '망원한강공원' : 1500,
+        '잠실한강공원': 1500,
+        '양화한강공원': 1500,
+        '난지한강공원' : 1300,
+        '광나루한강공원' : 820,
+        '강서한강공원' : 208,
+        '잠원한강공원(미래한강본부 잠원안내센터)' : 1500,
+        '뚝섬한강공원' : 659,
+        '이촌한강공원' : 1000,
     }
     
     # 2. .items()를 사용해 딕셔너리의 키(keyword)와 값(target_num)을 모두 가져옵니다.
