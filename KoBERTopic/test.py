@@ -17,11 +17,23 @@ extra_stopwords = {
     "to", "1988", "88", "마다", "지요", "중국", "시킬", "아닌", "한때",
     "신영복", "든다", "원하", "비축", "기지", "마시", "면서", "방사장", "어서",
     "다면", "나갈", "터도", "이러", "군요", "아서", "01", "으러", "인데",
-    "은데", "아주"
+    "은데", "아주", "데리", "나오", "", "정도", "요즘", "오랜만", "자체",
+    "짱개", "듬뿍", "울산", "매우", "많이", "그렇", "가운데", "레이", "그냥", "슬슬",
+    "직접", "활짝", "시작", "이파", "신발", "포원", "물끼", "무소", "메기", "접이식", "차시", "우동", "더불",
+    "당시", "배우", "제일", "아직", "도중", "그리", "리모", "취하",
+    '비올', '수많', '해치', '사울', '너무나', '중간', '가끔', '한눈',
+    '그나마'
 }
 
 # 3. 도메인 불용어 (리뷰마다 반복되는 단어)
-domain_stopwords = {"한강","공원","서울"}
+domain_stopwords = {"한강","공원", "서울", "서울시", "도산", "율현", "길동", "허브천문", "북서울꿈의숲", "방화", "서울식물원",
+                    "우장산", "관악산", "서울대공원", "아차산", "어린이대공원", "고척", "푸른수목원", "금천체육공원", "금천폭포공원",
+                    "불암산", "수락산", "서울창포원", "배봉산근린공원", "용두근린공원", "국립서울현충원", "보라매공원", "경의선숲길공원", "문화비축기지",
+                    "서대문독립공원", "매헌시민의숲", "청계산매봉", "달맞이공원", "서울숲공원", "천장산", "석촌호수공원", "올림픽공원", "서서울호수공원",
+                    "파리공원", "선유도공원", "여의도공원", "용산가족공원", "효창공원", "구파발폭포", "낙산공원", "인왕산", "남산공원",
+                    "서울로7017", "사가정공원", "중랑캠핑숲", "중랑가족캠핑장", "강서한강공원", "광나루한강공원", "난지한강공원", "뚝섬한강공원", "망원한강공원",
+                    "반포한강공원", "양화한강공원", "여의도한강공원", "이촌한강공원", "잠실한강공원", "잠원한강공원", "북한산국립공원", "북한산",
+                    "구로구", "식생", "라떼", "더욱", "항동", "히기", "시대", "살짝", "고리", "수지"}
 
 # 4. 최종 불용어 집합
 stopwords_ko = stopwords_ko.union(extra_stopwords).union(domain_stopwords)
@@ -32,8 +44,8 @@ class CustomTokenizer:
     def __init__(self, tagger, stopwords):
         self.tagger = tagger
         self.stopwords = stopwords
-        # ✅ 사용할 품사 태그 정의 (명사, 동사, 형용사 위주)
-        self.allowed_pos = {"NNG", "NNP", "VV", "VA"}
+        # allowed_pos를 조금 넓혀봄 (형용사, 부사까지 추가 가능)
+        self.allowed_pos = {"NNG", "NNP", "VV", "VA", "MAG"}  # 일반부사(MAG) 추가
 
     def __call__(self, sent):
         tokens = []
@@ -42,32 +54,24 @@ class CustomTokenizer:
                 tokens.append(word)
         return tokens
 
-    
 
 mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mecab-ko-dic"
 
 custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path), stopwords=stopwords_ko)
 
-vectorizer = CountVectorizer(
-    tokenizer=custom_tokenizer,
-    max_features=5000,
-    min_df=2,
-    max_df=0.9
-)
+# vectorizer = CountVectorizer(
+#     tokenizer=custom_tokenizer,
+#     max_features=5000,
+#     min_df=2,
+#     max_df=0.9
+# )
 
-model = BERTopic(
-    embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
-    vectorizer_model=vectorizer,
-    nr_topics=50,  # 토픽 개수는 50개로 시작, 나중에 'auto'로 변경 가능
-    top_n_words=10,
-    calculate_probabilities=True,
-    verbose=True
-)
+
 
 # 1. CSV 파일에서 리뷰 데이터 불러오기
 
 try:
-    df = pd.read_csv('./measure/NAT/data/강남_율현공원_reviews_dic_cleaned.csv')
+    df = pd.read_csv('./measure/NAT/data/중랑_중랑캠핑숲중랑가족캠핑장_reviews_dic_cleaned.csv')
     df.dropna(subset=['내용'], inplace=True)
     docs = df['내용'].astype(str).tolist()
     print(f"데이터 로드 완료: 총 {len(docs)}개의 리뷰를 분석합니다.")
@@ -101,7 +105,24 @@ except FileNotFoundError:
 #     docs = []
 #     print("CSV 파일에서 데이터를 불러오지 못했습니다.")
 
+vectorizer = CountVectorizer(
+    tokenizer=custom_tokenizer,
+    max_features=5000,
+    min_df=1,   # 무조건 허용
+    max_df=1.0  # 무조건 허용
+)
+
+model = BERTopic(
+    embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
+    vectorizer_model=vectorizer,
+    nr_topics='auto',  # 토픽 개수는 50개로 시작, 나중에 'auto'로 변경 가능
+    top_n_words=10,
+    calculate_probabilities=True,
+    verbose=True
+)
+
 if docs:
+    print("샘플 토큰 확인:", [custom_tokenizer(docs[i]) for i in range(min(5, len(docs)))])
     # 2. BERTopic 모델 학습 및 토픽 추출 실행
     topics, probs = model.fit_transform(docs)
 
