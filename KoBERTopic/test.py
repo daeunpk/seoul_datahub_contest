@@ -22,6 +22,7 @@ class CustomTokenizer:
         self.allowed_pos = allowed_pos if allowed_pos else ["NNG", "NNP", "VV", "VA"]
 
     def __call__(self, sent):
+<<<<<<< HEAD
         tokens = []
         for word, pos in self.tagger.pos(sent):
             if pos in self.allowed_pos and word not in self.stopwords and len(word) > 1:
@@ -36,6 +37,22 @@ vectorizer = CountVectorizer(tokenizer=custom_tokenizer,
                              max_features=5000,
                              min_df=5,
                              max_df=0.5)
+=======
+        sent = sent[:1000000]
+        word_tokens = self.tagger.morphs(sent)
+        result = [word for word in word_tokens if len(word) > 1]
+        return result
+
+# 서버로 돌릴 때
+# custom_tokenizer = CustomTokenizer(Mecab())
+    
+# 로컬에서 돌릴 떄: 경로 지정 (dicrc 파일이 들어있는 곳을 가리켜야 함)
+mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mecab-ko-dic"
+
+custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path))
+
+vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000)
+>>>>>>> 1faec8cdb9895bcef56581e862e5dc0959c16250
 
 model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
                  vectorizer_model=vectorizer,
