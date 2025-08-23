@@ -2,12 +2,42 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
 from bertopic import BERTopic
+from gensim.models.coherencemodel import CoherenceModel
 import pandas as pd
+import stopwordsiso as stopwords
+import os
+
+print("현재 작업 디렉토리:", os.getcwd())
+
+# 한국어 불용어 가져오기
+stopwords_ko = stopwords.stopwords("ko")
+# 도메인 특화 불용어 추가
+# domain_stopwords = {"한강", "공원", "잠원", "서울", "강변", "자전거"}
+# stopwords_ko = stopwords_ko.union(domain_stopwords)
 
 class CustomTokenizer:
-    def __init__(self, tagger):
+    def __init__(self, tagger, stopwords, allowed_pos=None):
         self.tagger = tagger
+        self.stopwords = stopwords
+        self.allowed_pos = allowed_pos if allowed_pos else ["NNG", "NNP", "VV", "VA"]
+
     def __call__(self, sent):
+<<<<<<< HEAD
+        tokens = []
+        for word, pos in self.tagger.pos(sent):
+            if pos in self.allowed_pos and word not in self.stopwords and len(word) > 1:
+                tokens.append(word)
+        return tokens
+    
+
+mecab = Mecab()
+custom_tokenizer = CustomTokenizer(mecab, stopwords=stopwords_ko)
+
+vectorizer = CountVectorizer(tokenizer=custom_tokenizer,
+                             max_features=5000,
+                             min_df=5,
+                             max_df=0.5)
+=======
         sent = sent[:1000000]
         word_tokens = self.tagger.morphs(sent)
         result = [word for word in word_tokens if len(word) > 1]
@@ -22,6 +52,7 @@ mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mec
 custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path))
 
 vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000)
+>>>>>>> 1faec8cdb9895bcef56581e862e5dc0959c16250
 
 model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
                  vectorizer_model=vectorizer,
@@ -32,7 +63,7 @@ model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base
 
 # 1. CSV 파일에서 리뷰 데이터 불러오기
 try:
-    df = pd.read_csv('GoogleMap_Crawling/data/한강_잠원한강공원_reviews_dic.csv')
+    df = pd.read_csv('../GoogleMap_Crawling/data/한강_잠원한강공원_reviews_dic.csv')
     # '내용' 컬럼에 비어있는 값(NaN)이 있으면 제거하고, 문자열로 변환
     df.dropna(subset=['내용'], inplace=True)
     docs = df['내용'].astype(str).tolist()
@@ -54,6 +85,25 @@ if docs:
     topic_info = model.get_topic_info()
     print(topic_info)
     
+    # 1. docs 토큰화 결과 (Mecab 사용)
+    tokenized_docs = [custom_tokenizer(doc) for doc in docs]
+
+    # 2. BERTopic 토픽별 단어 추출
+    topics = model.get_topics()
+    topic_words = []
+    for topic_num, words in topics.items():
+        if topic_num != -1:  # 노이즈 제외
+            topic_words.append([w for w, _ in words])
+
+    # 3. Coherence 계산
+    cm = CoherenceModel(
+        topics=topic_words,
+        texts=tokenized_docs,
+        coherence='c_v'
+    )
+    coherence_score = cm.get_coherence()
+    print("Topic Coherence Score:", coherence_score)
+        
     # 원본 df 대신, 모델이 반환한 'topics' 변수에서 토픽 번호를 가져옵니다.
     unique_topics = sorted(list(set(topics)))
 
