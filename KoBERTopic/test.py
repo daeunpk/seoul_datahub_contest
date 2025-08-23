@@ -12,8 +12,15 @@ class CustomTokenizer:
         word_tokens = self.tagger.morphs(sent)
         result = [word for word in word_tokens if len(word) > 1]
         return result
+
+# 서버로 돌릴 때
+# custom_tokenizer = CustomTokenizer(Mecab())
     
-custom_tokenizer = CustomTokenizer(Mecab())
+# 로컬에서 돌릴 떄: 경로 지정 (dicrc 파일이 들어있는 곳을 가리켜야 함)
+mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mecab-ko-dic"
+
+custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path))
+
 vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000)
 
 model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
