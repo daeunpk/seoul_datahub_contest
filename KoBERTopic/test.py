@@ -32,21 +32,28 @@ class CustomTokenizer:
     def __init__(self, tagger, stopwords):
         self.tagger = tagger
         self.stopwords = stopwords
+        # ✅ 사용할 품사 태그 정의 (명사, 동사, 형용사 위주)
+        self.allowed_pos = {"NNG", "NNP", "VV", "VA"}
+
     def __call__(self, sent):
         tokens = []
         for word, pos in self.tagger.pos(sent):
             if pos in self.allowed_pos and word not in self.stopwords and len(word) > 1:
                 tokens.append(word)
         return tokens
+
     
 
-mecab = Mecab()
-custom_tokenizer = CustomTokenizer(mecab, stopwords=stopwords_ko)
+mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mecab-ko-dic"
 
-vectorizer = CountVectorizer(tokenizer=custom_tokenizer,
-                             max_features=5000,
-                             min_df=5,
-                             max_df=0.5)
+custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path), stopwords=stopwords_ko)
+
+vectorizer = CountVectorizer(
+    tokenizer=custom_tokenizer,
+    max_features=5000,
+    min_df=2,
+    max_df=0.9
+)
 
 model = BERTopic(
     embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
@@ -60,7 +67,7 @@ model = BERTopic(
 # 1. CSV 파일에서 리뷰 데이터 불러오기
 
 try:
-    df = pd.read_csv('../measure/NAT/data/강남_율현공원_reviews_dic_cleaned.csv')
+    df = pd.read_csv('./measure/NAT/data/강남_율현공원_reviews_dic_cleaned.csv')
     df.dropna(subset=['내용'], inplace=True)
     docs = df['내용'].astype(str).tolist()
     print(f"데이터 로드 완료: 총 {len(docs)}개의 리뷰를 분석합니다.")
