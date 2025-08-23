@@ -23,7 +23,7 @@ class CustomTokenizer:
         return tokens
     
 
-mecab = Mecab(dicpath="/usr/local/lib/mecab/dic/mecab-ko-dic")
+mecab = Mecab()
 custom_tokenizer = CustomTokenizer(mecab, stopwords=stopwords_ko)
 
 vectorizer = CountVectorizer(tokenizer=custom_tokenizer,
