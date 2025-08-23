@@ -5,9 +5,15 @@ from bertopic import BERTopic
 from gensim.models.coherencemodel import CoherenceModel
 import pandas as pd
 import stopwordsiso as stopwords
+import os
+
+print("현재 작업 디렉토리:", os.getcwd())
 
 # 한국어 불용어 가져오기
 stopwords_ko = stopwords.stopwords("ko")
+# 도메인 특화 불용어 추가
+# domain_stopwords = {"한강", "공원", "잠원", "서울", "강변", "자전거"}
+# stopwords_ko = stopwords_ko.union(domain_stopwords)
 
 class CustomTokenizer:
     def __init__(self, tagger, stopwords, allowed_pos=None):
@@ -40,7 +46,7 @@ model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base
 
 # 1. CSV 파일에서 리뷰 데이터 불러오기
 try:
-    df = pd.read_csv('GoogleMap_Crawling/data/한강_잠원한강공원_reviews_dic.csv')
+    df = pd.read_csv('../GoogleMap_Crawling/data/한강_잠원한강공원_reviews_dic.csv')
     # '내용' 컬럼에 비어있는 값(NaN)이 있으면 제거하고, 문자열로 변환
     df.dropna(subset=['내용'], inplace=True)
     docs = df['내용'].astype(str).tolist()
