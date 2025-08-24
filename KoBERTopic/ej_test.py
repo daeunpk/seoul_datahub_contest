@@ -1,139 +1,155 @@
-import os
-import subprocess
-import pandas as pd
+## 환경설정 이슈...
+
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
 from bertopic import BERTopic
-import stopwordsiso as stopwords
+from umap import UMAP
+import pandas as pd
+import stopwordsiso as stopwords  # ✅ 불용어 패키지
+import os
 
-# ✨ IMPROVEMENT: 모든 로직을 main 함수로 묶어 코드 구조 개선
-def main():
-    """
-    메인 토픽 모델링 파이프라인을 실행하는 함수
-    """
-    # --- 1. 불용어 준비 ---
-    print("1. 불용어 목록을 준비합니다...")
-    stopwords_ko_base = stopwords.stopwords("ko")
-    extra_stopwords = {
-        "아요", "어요", "입니다", "예요", "네요", "같아요", "거에요", "거예요", "습니다",
-        "그리고", "가장", "정말", "진짜", "너무", "는데", "어서", "다는", "이렇게",
-        "여소", "달리", "^^", "~^^", "거나", "합니다", "로운", "끼리", "면서",
-        "to", "1988", "88", "마다", "지요", "중국", "시킬", "아닌", "한때",
-        "신영복", "든다", "원하", "비축", "기지", "마시", "면서", "방사장", "어서",
-        "다면", "나갈", "터도", "이러", "군요", "아서", "01", "으러", "인데",
-        "은데", "아주"
-    }
-    domain_stopwords = {"한강", "공원", "서울"}
-    final_stopwords = stopwords_ko_base.union(extra_stopwords).union(domain_stopwords)
-    print(f"   - 총 {len(final_stopwords)}개의 불용어를 사용합니다.")
+# 1. 한국어 불용어 불러오기
+stopwords_ko = stopwords.stopwords("ko")
 
-    # --- 2. 토크나이저 및 벡터라이저 준비 ---
-    print("2. 사용자 정의 토크나이저와 벡터라이저를 준비합니다...")
+# 2. 추가 불용어 (존댓말, 의미 없는 단어 등)
+extra_stopwords = {
+    "아요", "어요","입니다","예요","네요","같아요","거에요","거예요","습니다",
+    "그리고","가장","정말","진짜","너무", "는데", "어서", "다는", "이렇게",
+    "여소", "달리", "^^", "~^^", "거나", "합니다", "로운", "끼리", "면서",
+    "to", "1988", "88", "마다", "지요", "중국", "시킬", "아닌", "한때",
+    "신영복", "든다", "원하", "비축", "기지", "마시", "면서", "방사장", "어서",
+    "다면", "나갈", "터도", "이러", "군요", "아서", "01", "으러", "인데",
+    "은데", "아주", "데리", "나오", "", "정도", "요즘", "오랜만", "자체",
+    "짱개", "듬뿍", "울산", "매우", "많이", "그렇", "가운데", "레이", "그냥", "슬슬",
+    "직접", "활짝", "시작", "이파", "신발", "포원", "물끼", "무소", "메기", "접이식", "차시", "우동", "더불",
+    "당시", "배우", "제일", "아직", "도중", "그리", "리모", "취하",
+    '비올', '수많', '해치', '사울', '너무나', '중간', '가끔', '한눈',
+    '그나마'
+}
 
-    # ✨ IMPROVEMENT: 하드코딩된 경로 대신 동적으로 경로 찾기
-    try:
-        mecab_path_process = subprocess.run(
-            ["bash", "-c", "echo $(brew --prefix)/lib/mecab/dic/mecab-ko-dic"],
-            capture_output=True, text=True, check=True
-        )
-        mecab_dic_path = mecab_path_process.stdout.strip()
-        print(f"   - MeCab 사전 경로를 성공적으로 찾았습니다: {mecab_dic_path}")
-    except Exception:
-        print("   - ⚠️ MeCab 사전 경로를 자동으로 찾지 못했습니다. 수동 경로를 사용합니다.")
-        mecab_dic_path = "/opt/homebrew/lib/mecab/dic/mecab-ko-dic" # Fallback 경로
+# 3. 도메인 불용어 (리뷰마다 반복되는 단어)
+domain_stopwords = {"한강","공원", "서울", "서울시", "도산", "율현", "길동", "허브천문", "북서울꿈의숲", "방화", "서울식물원",
+                    "우장산", "관악산", "서울대공원", "아차산", "어린이대공원", "고척", "푸른수목원", "금천체육공원", "금천폭포공원",
+                    "불암산", "수락산", "서울창포원", "배봉산근린공원", "용두근린공원", "국립서울현충원", "보라매공원", "경의선숲길공원", "문화비축기지",
+                    "서대문독립공원", "매헌시민의숲", "청계산매봉", "달맞이공원", "서울숲공원", "천장산", "석촌호수공원", "올림픽공원", "서서울호수공원",
+                    "파리공원", "선유도공원", "여의도공원", "용산가족공원", "효창공원", "구파발폭포", "낙산공원", "인왕산", "남산공원",
+                    "서울로7017", "사가정공원", "중랑캠핑숲", "중랑가족캠핑장", "강서한강공원", "광나루한강공원", "난지한강공원", "뚝섬한강공원", "망원한강공원",
+                    "반포한강공원", "양화한강공원", "여의도한강공원", "이촌한강공원", "잠실한강공원", "잠원한강공원", "북한산국립공원", "북한산",
+                    "구로구", "식생", "라떼", "더욱", "항동", "히기", "시대", "살짝", "고리", "수지"}
 
-    class CustomTokenizer:
-        def __init__(self, tagger, stopwords):
-            self.tagger = tagger
-            self.stopwords = stopwords
-            # 🐛 BUG FIX: 허용할 품사(POS) 리스트를 __init__에 정의
-            # 명사(NNG, NNP), 동사(VV), 형용사(VA)를 주로 사용
-            self.allowed_pos = {'NNG', 'NNP', 'VV', 'VA'}
+# 4. 최종 불용어 집합
+stopwords_ko = stopwords_ko.union(extra_stopwords).union(domain_stopwords)
 
-        def __call__(self, text):
-            tokens = []
-            for word, pos in self.tagger.pos(text):
-                # 길이가 1 이상이고, 허용된 품사이면서, 불용어가 아닌 단어만 추출
-                if len(word) > 1 and pos in self.allowed_pos and word not in self.stopwords:
-                    tokens.append(word)
-            return tokens
 
-    # 🐛 BUG FIX: 일부 불용어(extra_stopwords)가 아닌 전체 불용어(final_stopwords) 사용
-    tokenizer = CustomTokenizer(Mecab(dicpath=mecab_dic_path), stopwords=final_stopwords)
+# --- 토크나이저 ---
+class CustomTokenizer:
+    def __init__(self, tagger, stopwords):
+        self.tagger = tagger
+        self.stopwords = stopwords
+        # allowed_pos를 조금 넓혀봄 (형용사, 부사까지 추가 가능)
+        self.allowed_pos = {"NNG", "NNP", "VV", "VA", "MAG"}  # 일반부사(MAG) 추가
 
-    vectorizer = CountVectorizer(tokenizer=tokenizer,
-                                 max_features=5000,
-                                 min_df=5,
-                                 max_df=0.5)
+    def __call__(self, sent):
+        tokens = []
+        for word, pos in self.tagger.pos(sent):
+            if pos in self.allowed_pos and word not in self.stopwords and len(word) > 1:
+                tokens.append(word)
+        return tokens
 
-    # --- 3. BERTopic 모델 준비 ---
-    print("3. BERTopic 모델을 초기화합니다...")
-    model = BERTopic(
-        embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
-        vectorizer_model=vectorizer,
-        nr_topics=50,
-        top_n_words=10,
-        calculate_probabilities=True,
-        verbose=True
-    )
 
-    # --- 4. 데이터 로드 ---
-    print("4. 리뷰 데이터를 로드합니다...")
-    # ✨ IMPROVEMENT: 여러 CSV 파일을 읽는 로직을 함수로 분리 (주석 처리)
-    # data_dir = "../measure/NAT/data/"
-    # docs = load_all_reviews(data_dir)
-    
-    # 단일 파일 로드
-    try:
-        df = pd.read_csv('measure/NAT/data/강남_율현공원_reviews_dic_cleaned.csv')
-        df.dropna(subset=['내용'], inplace=True)
-        docs = df['내용'].astype(str).tolist()
-        print(f"   - 데이터 로드 완료: 총 {len(docs)}개의 리뷰를 분석합니다.")
-    except FileNotFoundError:
-        print("   - ❌ 오류: 파일을 찾을 수 없습니다. 파일 경로를 확인해주세요.")
-        docs = []
+mecab_path = "/opt/homebrew/Cellar/mecab-ko-dic/2.1.1-20180720/lib/mecab/dic/mecab-ko-dic"
 
-    # --- 5. 모델 학습 및 결과 출력 ---
-    if not docs:
-        print("   - 분석할 데이터가 없습니다. 프로그램을 종료합니다.")
-        return
+custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path), stopwords=stopwords_ko)
 
-    print("\n5. BERTopic 모델 학습을 시작합니다...")
+# vectorizer = CountVectorizer(
+#     tokenizer=custom_tokenizer,
+#     max_features=5000,
+#     min_df=2,
+#     max_df=0.9
+# )
+
+
+
+# 1. CSV 파일에서 리뷰 데이터 불러오기
+
+try:
+    df = pd.read_csv('./measure/NAT/data/중랑_중랑캠핑숲중랑가족캠핑장_reviews_dic_cleaned.csv')
+    df.dropna(subset=['내용'], inplace=True)
+    docs = df['내용'].astype(str).tolist()
+    print(f"데이터 로드 완료: 총 {len(docs)}개의 리뷰를 분석합니다.")
+except FileNotFoundError:
+    print("오류: 파일을 찾을 수 없습니다. 파일 경로를 확인해주세요.")
+    docs = []
+
+# # 데이터 폴더 경로
+# data_dir = "../measure/NAT/data/"
+
+# # CSV 파일 모으기
+# all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(".csv")]
+
+# # 모든 파일 읽어서 하나의 DataFrame으로 합치기
+# df_list = []
+# for file in all_files:
+#     try:
+#         tmp = pd.read_csv(file)
+#         if "내용" in tmp.columns:
+#             tmp.dropna(subset=['내용'], inplace=True)
+#             df_list.append(tmp[['내용']])  # '내용' 컬럼만 가져오기
+#     except Exception as e:
+#         print(f"⚠️ {file} 읽기 실패: {e}")
+
+# # 전체 데이터 합치기
+# if df_list:
+#     df = pd.concat(df_list, ignore_index=True)
+#     docs = df['내용'].astype(str).tolist()
+#     print(f"총 {len(docs)}개의 리뷰를 분석합니다. ({len(all_files)}개 CSV 파일 합침)")
+# else:
+#     docs = []
+#     print("CSV 파일에서 데이터를 불러오지 못했습니다.")
+
+vectorizer = CountVectorizer(
+    tokenizer=custom_tokenizer,
+    max_features=5000,
+    min_df=1,   # 무조건 허용
+    max_df=1.0  # 무조건 허용
+)
+
+umap_model = UMAP(n_neighbors=15,
+                  n_components=5,
+                  min_dist=0.0,
+                  metric='cosine',
+                  random_state=42, # 결과를 재현 가능하게 하기 위해 추가
+                  n_jobs=1)        # <-- 이 부분이 충돌을 막습니다!
+
+model = BERTopic(
+    embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
+    vectorizer_model=vectorizer,
+    nr_topics='auto',  # 토픽 개수는 50개로 시작, 나중에 'auto'로 변경 가능
+    umap_model=umap_model,
+    top_n_words=10,
+    calculate_probabilities=True,
+    verbose=True
+)
+
+if docs:
+    print("샘플 토큰 확인:", [custom_tokenizer(docs[i]) for i in range(min(5, len(docs)))])
+    # 2. BERTopic 모델 학습 및 토픽 추출 실행
     topics, probs = model.fit_transform(docs)
 
+    # 3. 결과 확인: 생성된 토픽 정보 전체 출력
     print("\n" + "="*80)
-    print("✅ BERTopic 모델링 결과: 토픽 정보")
+    print("BERTopic 모델링 결과: 토픽 정보")
     print("="*80)
-    print(model.get_topic_info())
-
+    topic_info = model.get_topic_info()
+    print(topic_info)
+    
+    # 4. 결과 확인: 각 토픽별 키워드 확인
+    unique_topics = sorted(list(set(topics)))
     print("\n" + "="*80)
-    print("✅ 각 토픽별 상위 키워드")
+    print("각 토픽별 상위 키워드")
     print("="*80)
-    for topic_num in sorted(model.get_topics().keys()):
+    for topic_num in unique_topics:
         if topic_num != -1:  # -1번 토픽(노이즈)은 제외
-            keywords = [word for word, prob in model.get_topic(topic_num)]
-            print(f"Topic {topic_num}: {keywords}")
-
-def load_all_reviews(data_dir: str) -> list:
-    """지정된 디렉토리의 모든 CSV 파일에서 '내용' 컬럼을 읽어 리스트로 반환합니다."""
-    all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(".csv")]
-    df_list = []
-    print(f"   - 총 {len(all_files)}개의 CSV 파일을 읽습니다...")
-    for file in tqdm(all_files, desc="CSV 파일 로딩 중"):
-        try:
-            tmp = pd.read_csv(file)
-            if "내용" in tmp.columns:
-                tmp.dropna(subset=['내용'], inplace=True)
-                df_list.append(tmp[['내용']])
-        except Exception as e:
-            print(f"   - ⚠️ {file} 읽기 실패: {e}")
-    
-    if not df_list:
-        return []
-    
-    df = pd.concat(df_list, ignore_index=True)
-    return df['내용'].astype(str).tolist()
-
-if __name__ == "__main__":
-    main()
+            keywords = model.get_topic(topic_num)
+            print(f"Topic {topic_num}: {[word for word, prob in keywords]}")
