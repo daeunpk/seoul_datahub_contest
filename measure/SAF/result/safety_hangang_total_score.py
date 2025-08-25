@@ -45,7 +45,7 @@ for park, districts in han_parks.items():
         average_score = 0  # 해당 자치구의 점수가 하나도 없는 경우
         
     park_safety_scores.append({
-        '한강공원': park,
+        'park_name': park,
         '안전성_점수': average_score
     })
 
