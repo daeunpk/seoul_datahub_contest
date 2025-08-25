@@ -6,7 +6,7 @@ import io
 safety_data = pd.read_csv('measure/SAF/result/safety_total_score.csv').to_csv(index=False)
 saf_df = pd.read_csv(io.StringIO(safety_data))
 
-# '자치구'를 인덱스로 설정하면 점수를 쉽게 찾아올 수 있습니다.
+# '자치구'를 인덱스로 설정
 saf_df.set_index('자치구', inplace=True)
 
 # 2. 한강공원과 해당 자치구 목록 정의
@@ -21,37 +21,38 @@ han_parks = {
     '양화한강공원': ['영등포구'],
     '난지한강공원': ['마포구'],
     '강서한강공원': ['강서구'],
-    '여의도한강공원' : ['영등포구']
+    '여의도한강공원': ['영등포구']
 }
 
-# 3. 공원별 안전성 점수 계산
+# 3. 계산할 점수 컬럼 목록
+score_columns = ['safety_score', 'CRI_score', 'DRM_score', 'FIR_score', 'MED_score', 'RST_score', 'TRA_score']
+
+# 4. 공원별 점수 계산
 park_safety_scores = []
 
 for park, districts in han_parks.items():
-    scores = []
-    # 공원에 속한 자치구들의 safety_score를 가져옵니다.
-    for district in districts:
-        try:
-            # .loc를 사용해 해당 자치구의 safety_score를 찾습니다.
-            score = saf_df.loc[district, 'safety_score']
-            scores.append(score)
-        except KeyError:
-            print(f"경고: '{district}'의 안전성 점수 데이터를 찾을 수 없습니다. 계산에서 제외됩니다.")
+    park_scores = {'한강공원': park}
     
-    # 점수 리스트의 평균을 계산합니다.
-    if scores:
-        average_score = sum(scores) / len(scores)
-    else:
-        average_score = 0  # 해당 자치구의 점수가 하나도 없는 경우
+    for col in score_columns:
+        scores = []
+        for district in districts:
+            try:
+                score = saf_df.loc[district, col]
+                scores.append(score)
+            except KeyError:
+                print(f"경고: '{district}'의 {col} 데이터를 찾을 수 없습니다. 계산에서 제외됩니다.")
         
-    park_safety_scores.append({
-        'park_name': park,
-        '안전성_점수': average_score
-    })
+        # 평균 점수 계산
+        if scores:
+            park_scores[col] = sum(scores) / len(scores)
+        else:
+            park_scores[col] = 0
+    
+    park_safety_scores.append(park_scores)
 
-# 4. 결과를 DataFrame으로 변환하고 CSV로 저장
+# 5. 결과를 DataFrame으로 변환하고 CSV로 저장
 output_df = pd.DataFrame(park_safety_scores)
-output_df = output_df.sort_values(by='안전성_점수', ascending=False) # 점수 순으로 정렬
+output_df = output_df.sort_values(by='safety_score', ascending=False) # 종합 점수 기준 정렬
 
 output_filename = 'safety_hangang_total_score.csv'
 output_df.to_csv(output_filename, index=False, encoding='utf-8-sig')
