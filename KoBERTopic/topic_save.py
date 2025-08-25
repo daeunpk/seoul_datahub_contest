@@ -73,83 +73,98 @@ custom_tokenizer = CustomTokenizer(Mecab(dicpath=mecab_path), stopwords=stopword
 
 # 1. CSV 파일에서 리뷰 데이터 불러오기
 
+# 1. 분석할 파일 목록 가져오기
+data_dir = "./measure/NAT/data/"
+output_dir = "./bertopic_results/"
+os.makedirs(output_dir, exist_ok=True) # 결과 저장 폴더 생성
+
 try:
-    df = pd.read_csv('./measure/NAT/data/중랑_중랑캠핑숲중랑가족캠핑장_reviews_dic_cleaned.csv')
-    df.dropna(subset=['내용'], inplace=True)
-    docs = df['내용'].astype(str).tolist()
-    print(f"데이터 로드 완료: 총 {len(docs)}개의 리뷰를 분석합니다.")
+    all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(".csv")]
+    print(f"총 {len(all_files)}개의 공원 데이터를 분석합니다.")
 except FileNotFoundError:
-    print("오류: 파일을 찾을 수 없습니다. 파일 경로를 확인해주세요.")
-    docs = []
+    print(f"오류: '{data_dir}' 폴더를 찾을 수 없습니다. 경로를 확인해주세요.")
+    all_files = []
 
-# # 데이터 폴더 경로
-# data_dir = "../measure/NAT/data/"
 
-# # CSV 파일 모으기
-# all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith(".csv")]
-
-# # 모든 파일 읽어서 하나의 DataFrame으로 합치기
-# df_list = []
-# for file in all_files:
-#     try:
-#         tmp = pd.read_csv(file)
-#         if "내용" in tmp.columns:
-#             tmp.dropna(subset=['내용'], inplace=True)
-#             df_list.append(tmp[['내용']])  # '내용' 컬럼만 가져오기
-#     except Exception as e:
-#         print(f"⚠️ {file} 읽기 실패: {e}")
-
-# # 전체 데이터 합치기
-# if df_list:
-#     df = pd.concat(df_list, ignore_index=True)
-#     docs = df['내용'].astype(str).tolist()
-#     print(f"총 {len(docs)}개의 리뷰를 분석합니다. ({len(all_files)}개 CSV 파일 합침)")
-# else:
-#     docs = []
-#     print("CSV 파일에서 데이터를 불러오지 못했습니다.")
-
-vectorizer = CountVectorizer(
-    tokenizer=custom_tokenizer,
-    max_features=5000,
-    min_df=1,   # 무조건 허용
-    max_df=1.0  # 무조건 허용
-)
-
-umap_model = UMAP(n_neighbors=15,
-                  n_components=5,
-                  min_dist=0.0,
-                  metric='cosine',
-                  random_state=42, # 결과를 재현 가능하게 하기 위해 추가
-                  n_jobs=1)        # <-- 이 부분이 충돌을 막습니다!
-
-model = BERTopic(
-    embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
-    vectorizer_model=vectorizer,
-    nr_topics='auto',  # 토픽 개수는 50개로 시작, 나중에 'auto'로 변경 가능
-    umap_model=umap_model,
-    top_n_words=10,
-    calculate_probabilities=True,
-    verbose=True
-)
-
-if docs:
-    print("샘플 토큰 확인:", [custom_tokenizer(docs[i]) for i in range(min(5, len(docs)))])
-    # 2. BERTopic 모델 학습 및 토픽 추출 실행
-    topics, probs = model.fit_transform(docs)
-
-    # 3. 결과 확인: 생성된 토픽 정보 전체 출력
-    print("\n" + "="*80)
-    print("BERTopic 모델링 결과: 토픽 정보")
-    print("="*80)
-    topic_info = model.get_topic_info()
-    print(topic_info)
+# 2. 각 파일을 순회하며 개별적으로 분석 수행
+for file_path in tqdm(all_files, desc="전체 공원 분석 진행률"):
     
-    # 4. 결과 확인: 각 토픽별 키워드 확인
-    unique_topics = sorted(list(set(topics)))
-    print("\n" + "="*80)
-    print("각 토픽별 상위 키워드")
-    print("="*80)
-    for topic_num in unique_topics:
-        if topic_num != -1:  # -1번 토픽(노이즈)은 제외
-            keywords = model.get_topic(topic_num)
-            print(f"Topic {topic_num}: {[word for word, prob in keywords]}")
+    # 파일명에서 공원 이름 추출 (예: '중랑_중랑캠핑숲.csv' -> '중랑_중랑캠핑숲')
+    park_name = os.path.basename(file_path).replace('_reviews_dic_cleaned.csv', '')
+    
+    print(f"\n{'='*25} {park_name} 분석 시작 {'='*25}")
+
+    # 3. 개별 공원 데이터 불러오기
+    try:
+        df = pd.read_csv(file_path)
+        df.dropna(subset=['내용'], inplace=True)
+        docs = df['내용'].astype(str).tolist()
+        
+        # 리뷰 수가 너무 적으면 토픽 모델링이 의미 없으므로 건너뛰기
+        if len(docs) < 10:
+            print(f"⚠️ 리뷰 수가 10개 미만이므로 분석을 건너뜁니다. (리뷰 수: {len(docs)}개)")
+            continue
+        print(f"데이터 로드 완료: 총 {len(docs)}개 리뷰")
+
+    except Exception as e:
+        print(f"⚠️ 파일 읽기 실패: {e}")
+        continue # 다음 파일로 넘어감
+
+    # 4. BERTopic 모델 설정 (매번 새로운 모델로 분석)
+    #    - 모든 공원에 동일한 하이퍼파라미터를 적용하여 일관성 유지
+    vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000, min_df=2, max_df=0.85)
+    
+    umap_model = UMAP(n_neighbors=15, n_components=5, min_dist=0.0,
+                      metric='cosine', random_state=42, n_jobs=1)
+    
+    model = BERTopic(
+        embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens",
+        vectorizer_model=vectorizer,
+        umap_model=umap_model,
+        nr_topics='auto',
+        top_n_words=10,
+        calculate_probabilities=True,
+        verbose=False # 루프 안에서는 진행 로그를 끄는 것이 깔끔함
+    )
+
+    # 5. 모델 학습 및 토픽 추출 실행
+    try:
+        topics, probs = model.fit_transform(docs)
+        print("BERTopic 모델링 완료.")
+    except Exception as e:
+        print(f"⚠️ 모델 학습 중 오류 발생: {e}")
+        continue
+
+    # 6. 결과 저장 (이전 답변의 저장 로직 활용)
+    # 6-1. 토픽 요약 정보 저장
+    try:
+        topic_summary_df = model.get_topic_info()
+        summary_filepath = os.path.join(output_dir, f"{park_name}_topic_summary.csv")
+        topic_summary_df.to_csv(summary_filepath, index=False, encoding='utf-8-sig')
+        print(f"✅ 토픽 요약 정보 저장 완료: {summary_filepath}")
+        
+        # 콘솔에도 간단히 결과 출력
+        print("\n[생성된 토픽 요약]")
+        print(topic_summary_df)
+
+    except Exception as e:
+        print(f"⚠️ 토픽 요약 정보 저장 실패: {e}")
+
+    # 6-2. 원본 리뷰 + 할당된 토픽 ID 저장
+    try:
+        doc_topic_df = pd.DataFrame({'Review': docs, 'Topic_ID': topics})
+        detailed_filepath = os.path.join(output_dir, f"{park_name}_document_topics.csv")
+        doc_topic_df.to_csv(detailed_filepath, index=False, encoding='utf-8-sig')
+        print(f"✅ 문서별 토픽 할당 결과 저장 완료: {detailed_filepath}")
+    except Exception as e:
+        print(f"⚠️ 문서별 토픽 할당 결과 저장 실패: {e}")
+        
+    # 6-3. (선택) 학습된 모델 자체 저장
+    try:
+        model_filepath = os.path.join(output_dir, f"{park_name}.bertopic")
+        model.save(model_filepath, serialization="safetensors")
+        print(f"✅ BERTopic 모델 저장 완료: {model_filepath}")
+    except Exception as e:
+        print(f"⚠️ 모델 저장 실패: {e}")
+
+print(f"\n{'='*25} 모든 공원 분석 완료 {'='*25}")
