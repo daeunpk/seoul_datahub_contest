@@ -1,66 +1,52 @@
-import os
 import pandas as pd
 from collections import Counter
-import ast  # 문자열을 파이썬 객체(리스트)로 안전하게 변환하기 위한 라이브러리
+import ast  # 문자열을 파이썬 리스트로 안전하게 변환
 
-# 결과 파일들이 저장된 폴더 경로
-results_dir = "./bertopic_results/"
+# 🔽 이전에 모든 topic_summary.csv를 합쳐서 저장한 파일 이름을 여기에 입력하세요.
+combined_file_path = "./bertopic_results/combine_topic_summary.csv"
 
-# 1. 폴더 내의 모든 _topic_summary.csv 파일 경로 찾기
 try:
-    all_summary_files = [os.path.join(results_dir, f)
-                         for f in os.listdir(results_dir)
-                         if f.endswith("_topic_summary.csv")]
-    if not all_summary_files:
-        print(f"오류: '{results_dir}' 폴더에서 '_topic_summary.csv' 파일을 찾을 수 없습니다.")
-    else:
-        print(f"총 {len(all_summary_files)}개의 topic_summary 파일을 분석합니다.")
-except FileNotFoundError:
-    print(f"오류: '{results_dir}' 폴더를 찾을 수 없습니다. 경로를 확인해주세요.")
-    all_summary_files = []
+    # 1. 통합된 CSV 파일을 데이터프레임으로 읽어오기
+    df = pd.read_csv(combined_file_path)
+    print(f"✅ '{combined_file_path}' 파일을 성공적으로 불러왔습니다.")
 
-# 2. 모든 파일에서 키워드를 추출하여 하나의 리스트에 저장
-all_keywords = []
-for file_path in all_summary_files:
-    try:
-        df = pd.read_csv(file_path)
+    # 2. Topic ID가 -1인 행(노이즈 토픽)을 먼저 제외
+    df_filtered = df[df['Topic'] != -1].copy()
+    print(f"노이즈 토픽(-1)을 제외하고 총 {len(df_filtered)}개의 유효 토픽을 분석합니다.")
+    
+    # 3. 필터링된 데이터에서 모든 키워드를 하나의 리스트로 추출
+    all_keywords = []
+    
+    # 'Representation' 컬럼에 결측값이 있을 경우를 대비해 제거
+    df_filtered.dropna(subset=['Representation'], inplace=True)
+    
+    for keyword_str in df_filtered['Representation']:
+        try:
+            # 문자열 "['단어1', '단어2']"를 실제 리스트 ['단어1', '단어2']로 변환
+            keyword_list = ast.literal_eval(keyword_str)
+            if isinstance(keyword_list, list):
+                all_keywords.extend(keyword_list)
+        except (ValueError, SyntaxError):
+            # 변환 중 오류가 발생하면 건너뛰기
+            pass
+
+    # 4. 전체 키워드 리스트의 빈도수 계산
+    if all_keywords:
+        keyword_counts = Counter(all_keywords)
         
-        # 'Representation' 컬럼이 없는 경우 건너뛰기
-        if 'Representation' not in df.columns:
-            continue
-            
-        # 결측값(NaN)이 있는 행은 제외
-        df.dropna(subset=['Representation'], inplace=True)
+        # 5. 최종 결과를 데이터프레임으로 만들어 출력
+        print("\n" + "="*50)
+        print("    전체 공원 토픽 키워드 빈도수 분석 (노이즈 제외)")
+        print("="*50)
+        
+        counts_df = pd.DataFrame(keyword_counts.most_common(), columns=['Keyword', 'Frequency'])
+        
+        print(counts_df.to_string(index=False))
+        
+    else:
+        print("분석할 키워드를 찾지 못했습니다.")
 
-        # Representation 컬럼의 각 행(문자열)을 실제 리스트로 변환하여 all_keywords에 추가
-        for keyword_str in df['Representation']:
-            try:
-                # 예: "['산책', '나무']" -> ['산책', '나무']
-                keyword_list = ast.literal_eval(keyword_str)
-                if isinstance(keyword_list, list):
-                    all_keywords.extend(keyword_list)
-            except (ValueError, SyntaxError):
-                # 문자열이 리스트 형태가 아닐 경우의 예외 처리
-                # print(f"경고: '{keyword_str}'는 올바른 리스트 형식이 아닙니다. 건너뜁니다.")
-                pass
-
-    except Exception as e:
-        print(f"오류: '{file_path}' 파일을 처리하는 중 문제가 발생했습니다: {e}")
-
-# 3. 키워드 빈도수 계산
-if all_keywords:
-    keyword_counts = Counter(all_keywords)
-
-    # 4. 빈도수 높은 순서로 정렬하여 데이터프레임으로 변환 후 출력
-    print("\n" + "="*50)
-    print("      전체 공원 토픽 키워드 빈도수 분석 결과")
-    print("="*50)
-    
-    # 가장 흔한 50개 키워드를 데이터프레임으로 만듦
-    counts_df = pd.DataFrame(keyword_counts.most_common(), columns=['Keyword', 'Frequency'])
-    
-    # to_string()을 사용하여 전체 출력을 깔끔하게 정렬
-    print(counts_df.to_string(index=False))
-
-else:
-    print("\n분석할 키워드를 찾지 못했습니다. 파일 내용이나 경로를 확인해주세요.")
+except FileNotFoundError:
+    print(f"❌ 오류: '{combined_file_path}' 파일을 찾을 수 없습니다. 파일 이름을 확인해주세요.")
+except Exception as e:
+    print(f"❌ 파일 처리 중 오류가 발생했습니다: {e}")
