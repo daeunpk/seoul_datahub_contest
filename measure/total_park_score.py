@@ -7,6 +7,7 @@ import pandas as pd
 lei_file = 'measure/LEI/results/gu_leisure_score.csv'
 acc_file = 'measure/ACC/final_result/nonhangang_final.csv'
 saf_file = 'measure/SAF/result/safety_total_score.csv'
+# nat_file = 'measure/.csv'
 
 try:
     # 2. 각 CSV 파일 불러오기
